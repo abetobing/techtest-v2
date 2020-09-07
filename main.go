@@ -17,14 +17,26 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	r := chi.NewRouter()
-	r.Use(
-		middlewares.Database(api.GetDatabase()),
-		middlewares.Redis(api.GetRedis()),
-		middlewares.Authenticate,
-	)
-	r.Mount("/auth", auth.Routes())
-	r.Mount("/customer", customer.Routes())
+
+	// Guest: No authentication
+	r.Group(func(r chi.Router) {
+		r.Use(
+			middlewares.Database(api.GetDatabase()),
+			middlewares.Redis(api.GetRedis()),
+		)
+		r.Mount("/auth", auth.Routes())
+	})
+
+	// Resource: with auth
+	r.Group(func(r chi.Router) {
+		r.Use(
+			middlewares.Database(api.GetDatabase()),
+			middlewares.Redis(api.GetRedis()),
+			middlewares.Authenticate,
+		)
+		r.Mount("/customer", customer.Routes())
+	})
+
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
