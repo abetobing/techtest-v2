@@ -1,0 +1,2 @@
+database: "host=localhost port=5433 user=root password=DB4cc3sS dbname=customer sslmode=disable"
+redis_host: "redis"
