@@ -24,6 +24,7 @@ func main() {
 		r.Use(
 			middlewares.Database(api.GetDatabase()),
 			middlewares.Redis(api.GetRedis()),
+			middlewares.Header,
 		)
 		r.Mount("/auth", auth.Routes())
 	})
@@ -34,6 +35,7 @@ func main() {
 			middlewares.Database(api.GetDatabase()),
 			middlewares.Redis(api.GetRedis()),
 			middlewares.Authenticate,
+			middlewares.Header,
 		)
 		r.Mount("/customer", customer.Routes())
 	})
