@@ -10,7 +10,17 @@ services:
       POSTGRES_DB: customer
     volumes:
       - "./schema.sql:/docker-entrypoint-initdb.d/schema.sql"
+    ports: 
+      - 5432:5432
   redis:
     image: redis:6.0.5
+    ports: 
+      - 6379:6379
   application:
     build: .
+    restart: on-failure
+    depends_on: 
+      - database
+      - redis
+    ports: 
+      - 8080:8080

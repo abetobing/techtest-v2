@@ -1,0 +1,2 @@
+database: "host=database port=5432 user=user password=password dbname=customer sslmode=disable"
+redis_host: redis:6379

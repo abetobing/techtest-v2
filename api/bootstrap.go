@@ -16,12 +16,31 @@ var rds *redis.Client
 var config *Config
 
 type Config struct {
-	Database  string `yml:"database"`
-	RedisHost string `yml:"redis_host"`
+	Database  string `yaml:"database"`
+	RedisHost string `yaml:"redis_host"`
 }
 
 func LoadConfig(cfg *Config) error {
-	f, err := os.Open("config.yml")
+	configFile := "config"
+
+	var env string
+	if len(os.Args) > 1 {
+		env = os.Args[1]
+	}
+	if env != "" {
+		configFile += "-" + env
+	}
+	// config-staging.yml or config-prod.yml or just config.yml
+	configFile += ".yml"
+	log.Printf("Using %s as config file", configFile)
+	f, err := os.Open(configFile)
+	if err != nil {
+		// if no file found, fallback to default config.yml
+		f, err = os.Open("config.yml")
+		if err != nil {
+			return err
+		}
+	}
 	err = yaml.NewDecoder(f).Decode(&config)
 	f.Close()
 	if err != nil {
@@ -39,6 +58,7 @@ func GetDatabase() *sql.DB {
 }
 
 func GetRedis() *redis.Client {
+	log.Printf("Connecting to redis %s...", config.RedisHost)
 	rds := redis.NewClient(&redis.Options{
 		Addr: config.RedisHost,
 	})
