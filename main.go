@@ -24,8 +24,8 @@ func main() {
 		r.Use(
 			middlewares.Database(api.GetDatabase()),
 			middlewares.Redis(api.GetRedis()),
-			middlewares.Cors(),
 			middlewares.Header,
+			middlewares.Cors(),
 		)
 		r.Mount("/auth", auth.Routes())
 	})
@@ -35,9 +35,10 @@ func main() {
 		r.Use(
 			middlewares.Database(api.GetDatabase()),
 			middlewares.Redis(api.GetRedis()),
-			middlewares.Authenticate,
-			middlewares.Cors(),
 			middlewares.Header,
+			// middlewares.Authenticate, // disable old token authentication, now using jwt
+			middlewares.Jwt,
+			middlewares.Cors(),
 		)
 		r.Mount("/customer", customer.Routes())
 	})

@@ -7,6 +7,9 @@ import (
 	"time"
 
 	"customer/api/middlewares"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/go-chi/jwtauth"
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,11 +26,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := GenerateToken(32)
+	// token := GenerateToken(32)
+	// var claims jwt.Claims
+	claims := jwt.MapClaims{"user_id": id}
+	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
+	jwtauth.SetExpiryIn(claims, 5*time.Minute)
+	_, token, _ := tokenAuth.Encode(claims)
 	middlewares.GetRedis(r.Context()).Set(token, id, 5*time.Minute)
 	res.Token = token
 	b, _ := json.Marshal(res)
 	w.WriteHeader(http.StatusOK)
+	// json.NewEncoder(w).Encode(res)
 	w.Write(b)
 }
 

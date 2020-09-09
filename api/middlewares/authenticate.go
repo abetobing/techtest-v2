@@ -10,6 +10,7 @@ func Authenticate(next http.Handler) http.Handler {
 		if res.Err() != nil {
 			// fmt.Fprintln(w, "Unauthorize. Please login!")
 			w.WriteHeader(http.StatusUnauthorized)
+			return
 		}
 		next.ServeHTTP(w, r)
 	})
