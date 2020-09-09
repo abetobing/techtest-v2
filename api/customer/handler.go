@@ -19,7 +19,7 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(CreateResponse{CustomerID: id})
 }
 
@@ -27,8 +27,8 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	res, err := GetCustomer(middlewares.GetDB(r.Context()), id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: err.Error()})
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: http.StatusText(http.StatusNotFound)})
 		return
 	}
 	w.WriteHeader(http.StatusOK)
