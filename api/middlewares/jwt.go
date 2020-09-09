@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -21,17 +20,8 @@ func Jwt(next http.Handler) http.Handler {
 		tokenString := jwtauth.TokenFromHeader(r)
 		res := GetRedis(r.Context()).Get(tokenString)
 		if res.Err() != nil {
-			// fmt.Fprintln(w, "Unauthorize. Please login!")
-			// w.Header().Set("Content-Type", "text/plain")
-			w.WriteHeader(http.StatusUnauthorized)
-
-			generalError := GeneralError{Error: http.StatusText(http.StatusUnauthorized)}
-			e, err := json.Marshal(generalError)
-			if err != nil {
-				log.Fatal(err)
-			}
-			w.Write(e)
-			return
+			log.Printf("JWT auth failed, fallback to old token authentication")
+			Authenticate(next)
 		}
 
 		next.ServeHTTP(w, r)
